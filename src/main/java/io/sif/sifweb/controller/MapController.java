@@ -12,13 +12,27 @@ import java.util.Objects;
 @RequestMapping("/map")
 public class MapController {
 
+    @GetMapping("/startUpload")
+    @ResponseBody
+    public String startUpload(@RequestParam("dirname") String dirname) {
+
+
+        File file = new File(dirname);
+        boolean success = file.mkdir();
+        if (success) {
+            return "Start Upload on " + dirname;
+        } else {
+            return "Failed to Start Upload on" + dirname;
+        }
+    }
+
     @PostMapping("/imgUpload")
     @ResponseBody
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("dirname") String dirname) {
         if (!file.isEmpty()) {
             try {
                 BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(new File(Objects.requireNonNull(file.getOriginalFilename()))));
+                        new FileOutputStream(new File(dirname + "/" + Objects.requireNonNull(file.getOriginalFilename()))));
                 System.out.println(file.getName());
                 out.write(file.getBytes());
                 out.flush();
@@ -33,6 +47,15 @@ public class MapController {
         } else {
             return "Upload Failed: Empty File";
         }
+    }
+
+
+    @GetMapping("/endUpload")
+    @ResponseBody
+    public String endUpload(@RequestParam("dirname") String dirname) {
+        //Trigger OpenSFM
+
+        return "Trigger OpenSFM on " + dirname;
     }
 
 }
